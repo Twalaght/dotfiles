@@ -14,9 +14,14 @@ parser.add_argument("pool_id", metavar="pool_ID", type=str, help="Pool of images
 parser.add_argument("name", metavar="name", type=str, help="Name template to use when saving the images")
 args = parser.parse_args()
 
-# Read the config file from a specified location
+# Set up the config parser and read in the auths file if it exists
 config = configparser.ConfigParser()
-config.read(Path.home() / ".config" / "auths.txt")
+auths = Path(Path.home() / ".config" / "auths.txt")
+if auths.exists():
+    config.read(auths)
+else:
+    print("Authentication not found at \"~/.config/auths.txt\", please create it")
+    exit()
 
 # Set all relevant configuration variables
 user_agent = config.get("e621", "user_agent")
@@ -34,6 +39,9 @@ time.sleep(1.5)
 
 # Create the required folder with the given name
 Path(args.name).mkdir(parents=True, exist_ok=True)
+
+# Print an opening status message for the pool
+print("[Started downloading " + args.name + "]")
 
 # Download each page in the pool
 for page in range(len(pages)):
