@@ -2,8 +2,8 @@
 
 # Determine which files are present in FLAC folder, but not in MP3 folder
 # Ignores album art, and sanitizes output to be only file names
-flac_list=$(find $MUSIC_PATH/FLAC -type f -printf "%f\n" | sed -e '/^AlbumArt/d' -e 's/\.[^.]*$//')
-mp3_list=$(find $MUSIC_PATH/MP3 -type f -printf "%f\n" | sed -e '/^AlbumArt/d' -e 's/\.[^.]*$//')
+flac_list=$(find "$MUSIC_PATH"/FLAC -type f -printf "%f\n" | sed -e '/^AlbumArt/d' -e 's/\.[^.]*$//')
+mp3_list=$(find "$MUSIC_PATH"/MP3 -type f -printf "%f\n" | sed -e '/^AlbumArt/d' -e 's/\.[^.]*$//')
 
 # Take the difference of each file list
 diff_out=$(diff <(echo "$flac_list") <(echo "$mp3_list") | grep "<" | sed 's/< //')
