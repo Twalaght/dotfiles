@@ -6,6 +6,6 @@ case "$res" in
 	Lock) i3lock -c 222222;;
 	Sleep) systemctl suspend;;
 	Logout) i3-msg exit;;
-	Restart) "$HOME"/.scripts/goodnight.sh -r;;
-	Shutdown) "$HOME"/.scripts/goodnight.sh;;
+	Restart) shutdown now -r;;
+	Shutdown) shutdown now;;
 esac
