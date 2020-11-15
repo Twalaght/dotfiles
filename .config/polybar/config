@@ -1,0 +1,220 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;   ██████╗  ██████╗ ██╗  ██╗   ██╗██████╗  █████╗ ██████╗
+;   ██╔══██╗██╔═══██╗██║  ╚██╗ ██╔╝██╔══██╗██╔══██╗██╔══██╗
+;   ██████╔╝██║   ██║██║   ╚████╔╝ ██████╔╝███████║██████╔╝
+;   ██╔═══╝ ██║   ██║██║    ╚██╔╝  ██╔══██╗██╔══██║██╔══██╗
+;   ██║     ╚██████╔╝███████╗██║   ██████╔╝██║  ██║██║  ██║
+;   ╚═╝      ╚═════╝ ╚══════╝╚═╝   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+;             https://github.com/polybar/polybar
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[colors]
+background = ${xrdb:color0:#0c0211}
+background-alt = ${xrdb:color1:#632860}
+foreground = ${xrdb:color7:#c6a3c5}
+foreground-alt = ${xrdb:color2:#6f4e75}
+
+primary = ${xrdb:color3:#8f2455}
+primary-alt = ${xrdb:color4:#a2265a}
+secondary = ${xrdb:color5:#9b4072}
+secondary-alt = ${xrdb:color6:#664a97}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[bar/top]
+bottom = false
+fixed-center = true
+width = 100%
+height = 22
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+line-size = 3
+border-size = 3
+border-color = ${colors.background}
+module-margin= 2
+
+font-0 = Overpass:weight=bold:pixelsize=12;2
+font-1 = Feather:pixelsize=12;3
+
+modules-left = i3 xkeyboard mpd cpu memory usb-mount
+modules-center = xwindow
+modules-right = pulseaudio wireless-network wired-network brightness battery date
+
+tray-position = right
+tray-detached = false
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/i3]
+type = internal/i3
+format = <label-state> <label-mode>
+
+label-mode-foreground = ${colors.foreground}
+label-mode-background = ${colors.primary}
+label-mode-padding = 2
+
+label-focused = "%index%"
+label-focused-background = ${colors.background-alt}
+label-focused-underline= ${colors.primary}
+label-focused-padding = 2
+
+label-unfocused = "%index%"
+label-unfocused-padding = 2
+
+label-urgent = "%index%"
+label-urgent-background = ${colors.primary}
+label-urgent-padding = 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/xwindow]
+type = internal/xwindow
+format = <label>
+
+label = "%title%"
+label-maxlen = 40
+label-empty = "UwU"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/xkeyboard]
+type = internal/xkeyboard
+format = <label-indicator>
+
+blacklist-0 = num lock
+blacklist-1 = scroll lock
+
+label-indicator-padding = 2
+label-indicator-background = ${colors.primary}
+label-indicator-foreground = ${colors.background}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/cpu]
+type = internal/cpu
+format = <label>
+interval = 1
+
+label = " %percentage%%"
+format-padding = 2
+
+format-background = ${colors.primary-alt}
+format-foreground = ${colors.background}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/memory]
+type = internal/memory
+format = <label>
+interval = 1
+
+label = " %percentage_used%%"
+format-padding = 2
+
+format-background = ${colors.primary-alt}
+format-foreground = ${colors.background}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/pulseaudio]
+type = internal/pulseaudio
+format-volume = <ramp-volume> <label-volume>
+
+label-volume = "%percentage%%"
+label-volume-foreground = ${colors.foreground}
+
+label-muted = " MUTE"
+label-muted-foreground = ${colors.foreground-alt}
+
+ramp-volume-0 = ""
+ramp-volume-1 = ""
+ramp-volume-2 = ""
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/wireless-network]
+type = internal/network
+interface = wlp4s0
+interval = 3.0
+
+format-connected = <label-connected>
+label-connected = " %downspeed% %upspeed%"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/wired-network]
+type = internal/network
+interface = net0
+interval = 3.0
+
+format-connected = <label-connected>
+label-connected = " %downspeed% %upspeed%"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/battery]
+type = internal/battery
+battery = BAT0
+adapter = AC
+full-at = 97
+
+format-charging = <label-charging>
+format-discharging = <label-discharging>
+
+label-full = " %percentage%%"
+label-charging = " %percentage%%"
+label-discharging = " %percentage%%"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/date]
+type = internal/date
+format = <label>
+
+label = "%time%"
+time = "%l:%M %p"
+time-alt = "%a %d/%m"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/mpd]
+type = internal/mpd
+host = 127.0.0.1
+port = 6600
+interval = 2
+
+format-online = <icon-prev> <icon-play> <icon-pause> <icon-stop> <icon-next> <icon-random> <label-song> <label-time>
+format-offline = <label-offline>
+
+label-song = %artist:0:40:...% - %title:0:40:...%
+label-time = "(%total%)"
+label-offline = " OFFLINE"
+label-offline-foreground = ${colors.foreground-alt}
+
+icon-play = ""
+icon-pause = ""
+icon-stop = ""
+icon-prev = ""
+icon-next = ""
+icon-random = ""
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/brightness]
+type = custom/script
+exec = echo " $($HOME/.scripts/brightne.sh =)"
+interval = 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[module/usb-mount]
+type = custom/script
+tail = true
+exec = $HOME/.scripts/usbmount.sh --check
+click-left = $HOME/.scripts/usbmount.sh --mount
+click-right = $HOME/.scripts/usbmount.sh --umount
+click-middle = $HOME/.scripts/usbmount.sh --umountall

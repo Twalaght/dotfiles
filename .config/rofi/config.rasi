@@ -1,0 +1,13 @@
+configuration {
+	width: 500;
+
+	lines: 15;
+	columns: 1;
+
+	bw: 0;
+	padding: 100;
+	separator-style: "solid";
+
+	font: "Inconsolata-Bold 12";
+	theme: "~/.cache/wal/colors-rofi-light.rasi";
+}
