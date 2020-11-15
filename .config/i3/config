@@ -1,0 +1,155 @@
+# i3 config file (v4)
+# See https://i3wm.org/docs/userguide.html for a complete reference
+
+# Executables to be run on window manager start
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh # Status bar
+exec_always --no-startup-id picom --experimental-backends	# Compositor
+exec_always --no-startup-id nm-applet						# Network manager GUI
+exec_always --no-startup-id wal -R							# Restore pywal theme
+exec_always --no-startup-id fehbg							# Desktop background
+exec_always --no-startup-id udiskie							# Media mount tool
+
+# Remove window title bars and set window gaps
+for_window [class="^.*"] border pixel 2
+gaps inner 10
+gaps outer 0
+
+# Set mod key to windows key
+set $mod Mod4
+
+# Use mouse + $mod to drag floating windows
+floating_modifier $mod
+
+# Reload the i3 configuration file
+bindsym $mod+Shift+c reload
+
+# Restart i3 in place, preserving layout and session
+bindsym $mod+Shift+r restart
+
+# Open kitty as the default terminal
+bindsym $mod+Return exec kitty
+
+# Kill focused window
+bindsym $mod+Shift+q kill
+
+# Launch programs using rofi
+bindsym $mod+d exec rofi -show drun
+bindsym $mod+Shift+d exec rofi -show run
+
+# Toggle a window between tiling and floating
+bindsym $mod+Shift+space floating toggle
+
+# Change focus between tiling and floating windows
+bindsym $mod+space focus mode_toggle
+
+# Change focused window with vim or arrow keys
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Move focused window
+bindsym $mod+Ctrl+h move left
+bindsym $mod+Ctrl+j move down
+bindsym $mod+Ctrl+k move up
+bindsym $mod+Ctrl+l move right
+
+bindsym $mod+Ctrl+Left move left
+bindsym $mod+Ctrl+Down move down
+bindsym $mod+Ctrl+Up move up
+bindsym $mod+Ctrl+Right move right
+
+# Split in horizontal orientation
+bindsym $mod+c split h
+
+# Split in vertical orientation
+bindsym $mod+v split v
+
+# Enter full screen for the focused window
+bindsym $mod+f fullscreen toggle
+
+# Change window layout
+bindsym $mod+q layout tabbed
+bindsym $mod+w layout stacking
+bindsym $mod+e layout toggle split
+
+# Focus the parent container
+bindsym $mod+a focus parent
+
+# Focus the child container
+bindsym $mod+s focus child
+
+# Switch to a workspace
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
+bindsym $mod+4 workspace 4
+bindsym $mod+5 workspace 5
+bindsym $mod+6 workspace 6
+bindsym $mod+7 workspace 7
+bindsym $mod+8 workspace 8
+bindsym $mod+9 workspace 9
+bindsym $mod+0 workspace 10
+
+# Move focused window to a workspace
+bindsym $mod+Shift+1 move container to workspace 1
+bindsym $mod+Shift+2 move container to workspace 2
+bindsym $mod+Shift+3 move container to workspace 3
+bindsym $mod+Shift+4 move container to workspace 4
+bindsym $mod+Shift+5 move container to workspace 5
+bindsym $mod+Shift+6 move container to workspace 6
+bindsym $mod+Shift+7 move container to workspace 7
+bindsym $mod+Shift+8 move container to workspace 8
+bindsym $mod+Shift+9 move container to workspace 9
+bindsym $mod+Shift+0 move container to workspace 10
+
+# Resize a window, with vim or arrow keys, or the mouse
+bindsym $mod+r mode "resize"
+mode "resize" {
+        bindsym h resize shrink width 10 px or 5 ppt
+        bindsym j resize shrink height 10 px or 5 ppt
+        bindsym k resize grow height 10 px or 5 ppt
+        bindsym l resize grow width 10 px or 5 ppt
+
+        bindsym Left resize shrink width 10 px or 5 ppt
+        bindsym Down resize shrink height 10 px or 5 ppt
+        bindsym Up resize grow height 10 px or 5 ppt
+        bindsym Right resize grow width 10 px or 5 ppt
+
+        bindsym Shift+h resize shrink width 100 px or 10 ppt
+        bindsym Shift+j resize shrink height 100 px or 10 ppt
+        bindsym Shift+k resize grow height 100 px or 10 ppt
+        bindsym Shift+l resize grow width 100 px or 10 ppt
+
+        bindsym Shift+Left resize shrink width 100 px or 10 ppt
+        bindsym Shift+Down resize shrink height 100 px or 10 ppt
+        bindsym Shift+Up resize grow height 100 px or 10 ppt
+        bindsym Shift+Right resize grow width 100 px or 10 ppt
+
+        # Return to back to normal with enter or escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+# Lock, sleep, logout, restart, or shutdown the system
+bindsym $mod+Shift+e exec "$HOME/.scripts/i3menu.sh"
+
+# Screen brightness controls
+bindsym XF86MonBrightnessUp exec "$HOME/.scripts/brightne.sh +"
+bindsym XF86MonBrightnessDown exec "$HOME/.scripts/brightne.sh -"
+
+# Pulseaudio controls
+bindsym XF86AudioRaiseVolume exec "pulseaudio-ctl up 2"
+bindsym XF86AudioLowerVolume exec "pulseaudio-ctl down 2"
+bindsym XF86AudioMute exec "pulseaudio-ctl mute"
+
+# Media player controls
+bindsym XF86AudioPlay exec "mpc play"
+bindsym XF86AudioPause exec "mpc pause"
+bindsym XF86AudioNext exec "mpc next"
+bindsym XF86AudioPrev exec "mpc previous"
