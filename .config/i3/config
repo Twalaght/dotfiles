@@ -144,9 +144,9 @@ bindsym XF86MonBrightnessUp exec "$HOME/.scripts/brightne.sh +"
 bindsym XF86MonBrightnessDown exec "$HOME/.scripts/brightne.sh -"
 
 # Pulseaudio controls
-bindsym XF86AudioRaiseVolume exec "pulseaudio-ctl up 2"
-bindsym XF86AudioLowerVolume exec "pulseaudio-ctl down 2"
-bindsym XF86AudioMute exec "pulseaudio-ctl mute"
+bindsym XF86AudioRaiseVolume exec "$HOME/.scripts/volume.sh +"
+bindsym XF86AudioLowerVolume exec "$HOME/.scripts/volume.sh -"
+bindsym XF86AudioMute exec "$HOME/.scripts/volume.sh m"
 
 # Media player controls
 bindsym XF86AudioPlay exec "mpc play"
