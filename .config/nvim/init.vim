@@ -39,6 +39,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'haya14busa/incsearch.vim'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
+
 call plug#end()
 
 
@@ -68,6 +69,8 @@ map g# <Plug>(incsearch-nohl-g#)
 
 
 " ----- Remap settings -----
+" Delete without copying visual block
+vnoremap <leader>p "_dP
 " Keep visual block highlighted after indent
 vnoremap < <gv
 vnoremap > >gv
