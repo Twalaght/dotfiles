@@ -35,6 +35,10 @@ alias g="git"
 # Binds
 bind "set bell-style none"
 
+# Set the default editor
+export EDITOR="nvim"
+export VISUAL="nvim"
+
 # Enable persistence for wal colour schemes
 if [[ -f $HOME/.cache/wal/sequences ]]; then
 	(cat ~/.cache/wal/sequences &)
