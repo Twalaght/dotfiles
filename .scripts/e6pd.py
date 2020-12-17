@@ -34,7 +34,7 @@ b64_auth = "Basic " + base64.b64encode(user_auth).decode("ascii")
 headers = {"User-Agent": user_agent, "Authorization": b64_auth}
 
 # Get all the post IDs belonging to the pool
-pages = get("https://e621.net/pools/" + args.pool_id + ".json", headers=headers).json()["post_ids"]
+pages = get(f"https://e621.net/pools/{args.pool_id}.json", headers=headers).json()["post_ids"]
 time.sleep(1.5)
 
 # Create the required folder with the given name
@@ -49,7 +49,7 @@ for page in range(len(pages)):
     print(f"Downloading page {str(page + 1)} of {str(len(pages))}...")
 
     # Get the source for each individual image
-    image = get("https://e621.net/posts/" + str(pages[page]) + ".json", headers=headers).json()["post"]["file"]["url"]
+    image = get(f"https://e621.net/posts/{str(pages[page])}.json", headers=headers).json()["post"]["file"]["url"]
     time.sleep(1.5)
 
     # Generate the file path for each image to be saved to
@@ -60,4 +60,4 @@ for page in range(len(pages)):
     time.sleep(1.5)
 
 # Print a final status when all downloads are finished
-print(f"Finished downloading {args.name}")
+print(f"[Finished downloading {args.name}]")
