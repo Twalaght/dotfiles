@@ -16,11 +16,11 @@ args = parser.parse_args()
 
 # Set up the config parser and read in the auths file if it exists
 config = configparser.ConfigParser()
-auths = Path(Path.home() / ".config" / "auths.txt")
+auths = Path.home() / ".config" / "auths.txt"
 if auths.exists():
     config.read(auths)
 else:
-    print("Authentication not found at \"~/.config/auths.txt\", please create it")
+    print(f"Authentication not found at {auths}, please create it")
     exit()
 
 # Set all relevant configuration variables
@@ -41,13 +41,13 @@ time.sleep(1.5)
 Path(args.name).mkdir(parents=True, exist_ok=True)
 
 # Print an opening status message for the pool
-print("[Started downloading " + args.name + "]")
+print(f"[Started downloading {args.name}]")
 
 # Download each page in the pool
 for page in range(len(pages)):
     # Print a status message for each page
-    print("Downloading page " + str(page + 1) + " of " + str(len(pages)) + "...")
-    
+    print(f"Downloading page {str(page + 1)} of {str(len(pages))}...")
+
     # Get the source for each individual image
     image = get("https://e621.net/posts/" + str(pages[page]) + ".json", headers=headers).json()["post"]["file"]["url"]
     time.sleep(1.5)
@@ -56,8 +56,8 @@ for page in range(len(pages)):
     img_path = Path.cwd() / args.name / (args.name + " " + str(page + 1).zfill(len(str(len(pages)))) + Path(image).suffix)
 
     # Write the image to disk
-    urllib.request.urlretrieve(image, img_path) 
+    urllib.request.urlretrieve(image, img_path)
     time.sleep(1.5)
 
 # Print a final status when all downloads are finished
-print("Finished downloading " + args.name)
+print(f"Finished downloading {args.name}")
