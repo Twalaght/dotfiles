@@ -1,0 +1,29 @@
+# Shell aliases
+
+# Colourise output when possible
+alias \
+	ls="ls -hN --color=auto --group-directories-first" \
+	grep="grep --color=auto" \
+	diff="diff --color=auto" \
+	ccat="highlight --out-format=ansi"
+
+# Common file commands
+alias \
+	ll="ls -l" \
+	la="ls -A" \
+	lal="ls -lA" \
+	cp="cp -iv" \
+	mv="mv -iv" \
+	rm="rm -vI" \
+	df="df -h"
+
+# TODO
+# Common system commands
+alias \
+	p="sudo pacman" \
+	v="$EDITOR" \
+	sv="sudo nvim" \
+	r="ranger" \
+	sr="sudo ranger" \
+	ka="killall" \
+	g="git"
