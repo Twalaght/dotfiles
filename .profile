@@ -1,10 +1,8 @@
-# Source the bashrc if running bash
-if [ -n "$BASH" ] && [ -r $HOME/.bashrc ]; then
-	. $HOME/.bashrc
-fi
-
 # Add scripts to path
 export PATH="${PATH}:$HOME/.scripts/"
 
-# Export some environmental variables
+# Set the default music path
 export MUSIC_PATH="/mnt/f/Media/Music"
+
+# Disable the bell in less
+export LESS="$LESS -R -Q"
