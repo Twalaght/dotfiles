@@ -80,3 +80,6 @@ nnoremap <leader>O O<Esc>j
 " Remap F6 to toggle spellcheck
 nnoremap <silent> <F6> :set spell!<cr>
 inoremap <silent> <F6> <C-O>:set spell!<cr>
+" Remap F5 to insert a timestamp
+nnoremap <F5> "=strftime("%I:%M %p %a %d/%m/%Y")<CR>p
+inoremap <F5> <C-R>=strftime("%I:%M %p %a %d/%m/%Y")<CR>
