@@ -4,8 +4,8 @@ import argparse
 import base64
 import configparser
 import time
-import urllib.parse
-import urllib.request
+from urllib.parse import quote_plus
+from urllib.request import urlretrieve
 from pathlib import Path
 from requests import get
 
@@ -35,18 +35,22 @@ user_auth = (user_name + ":" + API_key).encode("ascii")
 b64_auth = "Basic " + base64.b64encode(user_auth).decode("ascii")
 headers = {"User-Agent": user_agent, "Authorization": b64_auth}
 
-# Check if the target is a pool or tag, and url encode it if it is a tag
+# Check if the target is a pool or tag, and URL encode it if it is a tag
 is_pool = True
 if not args.target.isnumeric():
     is_pool = False
-    args.target = urllib.parse.quote_plus(args.target)
+    args.target = quote_plus(args.target)
 
 # Ensure a title is given for a pool download
 if is_pool and not args.title:
     print("A title is required when downloading a pool")
     exit()
 
-print(f"[Collecting links for {args.target}]")
+# Print the collection status message
+if args.title:
+    print(f"[Collecting links for {args.title}]")
+else:
+    print(f"[Collecting links for {args.target}]")
 
 # Fetch all post IDs in a pool, or iterate over every page for all post IDs in a tag
 images = []
@@ -81,14 +85,13 @@ else:
         # Delay as to not spam API requests
         time.sleep(1)
 
-# Create the required folder with the title if provided, or the target name
+# Create the required folder with the respective title, and print a status message
 if args.title:
+    print(f"[Started downloading {args.title} with {len(images)} images]")
     Path(args.title).mkdir(parents=True, exist_ok=True)
 else:
+    print(f"[Started downloading {args.target} with {len(images)} images]")
     Path(args.target).mkdir(parents=True, exist_ok=True)
-
-# Print an opening status message for the pool
-print(f"[Started downloading {args.target} with {len(images)} images]")
 
 # Download each image from the collected IDs
 for image in range(len(images)):
@@ -108,7 +111,7 @@ for image in range(len(images)):
         img_path = Path.cwd() / args.target / f"{str(images[image])}__{artist}{Path(source).suffix}"
 
     # Write the image to disk
-    urllib.request.urlretrieve(source, img_path)
+    urlretrieve(source, img_path)
     time.sleep(1)
 
 # Print a final status when all downloads are finished
