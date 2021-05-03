@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
 import argparse
-import base64
-import configparser
-import time
-from urllib.parse import quote_plus
-from urllib.request import urlretrieve
+from base64 import b64encode
+from configparser import ConfigParser
 from pathlib import Path
 from requests import get
+from time import sleep
+from urllib.parse import quote_plus
+from urllib.request import urlretrieve
 
 # Read the arguments given to the script
 parser = argparse.ArgumentParser(description="Download images from e621 from a tag or pool")
@@ -16,8 +16,8 @@ parser.add_argument("-t", "--title", type=str, help="set the title of the downlo
 parser.add_argument("-l", "--limit", type=int, help="set the limit for how many images to download, for tags only")
 args = parser.parse_args()
 
-# Set up the config parser and read in the auths file if it exists
-config = configparser.ConfigParser()
+# Set up the config parser and read in the auths file
+config = ConfigParser()
 auths = Path.home() / ".config" / "auths.txt"
 if auths.exists():
     config.read(auths)
@@ -25,97 +25,67 @@ else:
     print(f"Authentication not found at {auths}, please create it")
     exit()
 
-# Set all relevant configuration variables
-user_agent = config.get("e621", "user_agent")
-user_name = config.get("e621", "user_name")
-API_key = config.get("e621", "API_key")
+# Calculate the b64_auth credential and set the request header
+b64_auth = b64encode(f"{config.get('e621', 'user_name')}:{config.get('e621', 'API_key')}".encode("ascii")).decode("ascii")
+headers = {"User-Agent": config.get("e621", "user_agent"), "Authorization": f"Basic {b64_auth}"}
 
-# Calculate the basic auth b64 credential and set the required request header
-user_auth = (user_name + ":" + API_key).encode("ascii")
-b64_auth = "Basic " + base64.b64encode(user_auth).decode("ascii")
-headers = {"User-Agent": user_agent, "Authorization": b64_auth}
+# Check if target is a tag or pool
+is_pool = True if args.target.isnumeric() else False
 
-# Check if the target is a pool or tag, and URL encode it if it is a tag
-is_pool = True
-if not args.target.isnumeric():
-    is_pool = False
-    args.target = quote_plus(args.target)
+# Set a default title if no title is provided
+if not args.title:
+    if is_pool: args.title = get(f"https://e621.net/pools/{args.target}.json", headers = headers).json()["name"].replace("_", " ")
+    if not is_pool: args.title = args.target.replace("_(artist)", "")
 
-# Ensure a title is given for a pool download
-if is_pool and not args.title:
-    print("A title is required when downloading a pool")
-    exit()
+# URL encode the target so it can be used for API requests
+args.target = quote_plus(f"pool:{args.target}") if is_pool else quote_plus(args.target)
 
-# Print the collection status message
-if args.title:
-    print(f"[Collecting links for {args.title}]")
-else:
-    print(f"[Collecting links for {args.target}]")
+# Print the initial status message
+print(f"[Preparing {args.title}]")
 
-# Fetch all post IDs in a pool, or iterate over every page for all post IDs in a tag
+# Iterate until IDs and URLs are found for every post
 images = []
-if is_pool:
-    # Fetch post IDs directly into the pages array
-    images = get(f"https://e621.net/pools/{args.target}.json", headers = headers).json()["post_ids"]
-else:
-    while True:
-        if len(images) > 0:
-            page = "b" + str(images[-1])
-        else:
-            page = ""
+while True:
+    # Set the page number on every request past the first one
+    page = f"b{images[-1][0]}" if len(images) > 0 else ""
 
-        # Fetch tag listings of a given page into a temp array
-        temp = get(f"https://e621.net/posts.json?tags={args.target}&page={page}", headers = headers).json()["posts"]
+    # Request the list of posts through the API
+    posts = get(f"https://e621.net/posts.json?limit=320&tags={args.target}&page={page}", headers = headers).json()["posts"]
 
-        # Break when we have reached the last page
-        if len(temp) == 0:
-            break
+    # Parse each post into their respective arrays
+    for post in posts: images.append([post["id"], post["file"]["url"]])
 
-        # Parse the post IDs into the main pages array
-        for image in range(len(temp)):
-            images.append(temp[image]["id"])
+    # Limit the parsed posts to that of the limit argument
+    if args.limit and len(images) >= args.limit:
+        images = images[:args.limit]
+        break
 
-        # Cap the images found to the limit, if provided
-        if args.limit and len(images) > args.limit:
-            images = images[:args.limit]
-            break
+    # If a set of posts did not reach the requested size, it was the final set
+    if len(posts) < 320: break
 
-        print(f"Found {len(images)} links...")
+    # Delay requests to ensure the proper rate limit to the API
+    sleep(1)
 
-        # Delay as to not spam API requests
-        time.sleep(1)
+# Download pools in reverse upload order
+if is_pool: images.reverse()
 
 # Create the required folder with the respective title, and print a status message
-if args.title:
-    print(f"[Started downloading {args.title} with {len(images)} images]")
-    Path(args.title).mkdir(parents=True, exist_ok=True)
-else:
-    print(f"[Started downloading {args.target} with {len(images)} images]")
-    Path(args.target).mkdir(parents=True, exist_ok=True)
+print(f"[Downloading {args.title} with {len(images)} posts]")
+Path(args.title).mkdir(parents=True, exist_ok=True)
 
-# Download each image from the collected IDs
+# Download each image from the collected links
 for image in range(len(images)):
-    # Print a status message for each page
-    print(f"Downloading page {str(image + 1)} of {str(len(images))}...")
+    # Print a status message for each image
+    print(f"- Downloading image {str(image + 1)} of {str(len(images))}...")
 
-    # Request the json file from the site
-    request = get(f"https://e621.net/posts/{str(images[image])}.json", headers=headers).json()
-    source = request["post"]["file"]["url"]
-    time.sleep(1)
-
-    # Title a tag or pool image with their respective naming convention
-    if is_pool:
-        img_path = Path.cwd() / args.title / f"{args.title} {str(image + 1).zfill(len(str(len(images))))}{Path(source).suffix}"
-    else:
-        artist = request["post"]["tags"]["artist"][0]
-        img_path = Path.cwd() / args.target / f"{str(images[image])}__{artist}{Path(source).suffix}"
+    # Set an images download path with the respective naming convention
+    padding = len(str(len(images)))
+    extension = Path(images[image][1]).suffix
+    if is_pool: img_path = Path.cwd() / args.title / f"{args.title} {str(image + 1).zfill(padding)}{extension}"
+    if not is_pool: img_path = Path.cwd() / args.title / f"{str(images[image][0])}__{args.title}{extension}"
 
     # Write the image to disk
-    urlretrieve(source, img_path)
-    time.sleep(1)
+    urlretrieve(images[image][1], img_path)
 
 # Print a final status when all downloads are finished
-if args.title:
-    print(f"[Finished downloading {args.title}]")
-else:
-    print(f"[Finished downloading {args.target}]")
+print(f"[Finished {args.title}]")
