@@ -3,6 +3,7 @@
 import argparse
 from base64 import b64encode
 from configparser import ConfigParser
+from multiprocessing import Pool, cpu_count
 from pathlib import Path
 from requests import get
 from time import sleep
@@ -73,19 +74,24 @@ if is_pool: images.reverse()
 print(f"[Downloading {args.title} with {len(images)} posts]")
 Path(args.title).mkdir(parents=True, exist_ok=True)
 
-# Download each image from the collected links
-for image in range(len(images)):
-    # Print a status message for each image
-    print(f"- Downloading image {str(image + 1)} of {str(len(images))}...")
+# Download an image from a tuple of arguments
+def download_image(image_url, image_path, index):
+    # Print status messages over each other, and retrieve the image to disk
+    print(f"[Downloading image {index} of {len(images)}]", end = "\r")
+    urlretrieve(image_url, image_path)
 
+# Create an entry in the download argument list for each post
+download_args = []
+for image in range(len(images)):
     # Set an images download path with the respective naming convention
     padding = len(str(len(images)))
     extension = Path(images[image][1]).suffix
     if is_pool: img_path = Path.cwd() / args.title / f"{args.title} {str(image + 1).zfill(padding)}{extension}"
     if not is_pool: img_path = Path.cwd() / args.title / f"{str(images[image][0])}__{args.title}{extension}"
+    download_args.append((images[image][1], img_path, image + 1))
 
-    # Write the image to disk
-    urlretrieve(images[image][1], img_path)
+# Create a pool of threads, and use them to download images in parallel
+Pool(cpu_count()).starmap(download_image, download_args, chunksize = 1)
 
 # Print a final status when all downloads are finished
 print(f"[Finished {args.title}]")
