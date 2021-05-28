@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import argparse
+from argparse import ArgumentParser
 from base64 import b64encode
 from configparser import ConfigParser
 from multiprocessing import Pool, cpu_count
@@ -11,7 +11,7 @@ from urllib.parse import quote_plus
 from urllib.request import urlretrieve
 
 # Read the arguments given to the script
-parser = argparse.ArgumentParser(description="Download images from e621 from a tag or pool")
+parser = ArgumentParser(description="Download images from e621 from a tag or pool")
 parser.add_argument("target", metavar="tag/pool", type=str, help="tag or pool to download (Ex: anthro, 11686)")
 parser.add_argument("-t", "--title", type=str, help="set the title of the download set, for pools only")
 parser.add_argument("-l", "--limit", type=int, help="set the limit for how many images to download, for tags only")
@@ -34,9 +34,7 @@ headers = {"User-Agent": config.get("e621", "user_agent"), "Authorization": f"Ba
 is_pool = True if args.target.isnumeric() else False
 
 # Set a default title if no title is provided
-if not args.title:
-    if is_pool: args.title = get(f"https://e621.net/pools/{args.target}.json", headers = headers).json()["name"].replace("_", " ")
-    if not is_pool: args.title = args.target.replace("_(artist)", "")
+if not args.title: args.title = get(f"https://e621.net/pools/{args.target}.json", headers = headers).json()["name"].replace("_", " ") if is_pool else args.target
 
 # URL encode the target so it can be used for API requests
 args.target = quote_plus(f"pool:{args.target}") if is_pool else quote_plus(args.target)
@@ -53,8 +51,8 @@ while True:
     # Request the list of posts through the API
     posts = get(f"https://e621.net/posts.json?limit=320&tags={args.target}&page={page}", headers = headers).json()["posts"]
 
-    # Parse each post into their respective arrays
-    for post in posts: images.append([post["id"], post["file"]["url"]])
+    # Parse each post into their respective arrays, with image ID, full size URL, and artist name
+    for post in posts: images.append([post["id"], post["file"]["url"], post["tags"]["artist"][0].replace("_(artist)", "")])
 
     # Limit the parsed posts to that of the limit argument
     if args.limit and len(images) >= args.limit:
@@ -87,11 +85,11 @@ for image in range(len(images)):
     padding = len(str(len(images)))
     extension = Path(images[image][1]).suffix
     if is_pool: img_path = Path.cwd() / args.title / f"{args.title} {str(image + 1).zfill(padding)}{extension}"
-    if not is_pool: img_path = Path.cwd() / args.title / f"{str(images[image][0])}__{args.title}{extension}"
+    if not is_pool: img_path = Path.cwd() / args.title / f"{str(images[image][0])}__{images[image][2]}{extension}"
     download_args.append((images[image][1], img_path, image + 1))
 
 # Create a pool of threads, and use them to download images in parallel
 Pool(cpu_count()).starmap(download_image, download_args, chunksize = 1)
 
 # Print a final status when all downloads are finished
-print(f"[Finished {args.title}]")
+print(f"\n[Finished {args.title}]")
