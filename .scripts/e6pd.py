@@ -94,4 +94,4 @@ for image in range(len(images)):
 Pool(cpu_count()).starmap(download_image, download_args, chunksize = 1)
 
 # Print a final status when all downloads are finished
-print(f"[Finished {args.title}]")
+print(f"\n[Finished {args.title}]")
