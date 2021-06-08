@@ -23,7 +23,6 @@ set mouse=a
 " Remove trailing whitespace on save
 autocmd BufWritePre * %s/\s\+$//e
 
-
 " ----- Plugin management -----
 call plug#begin('~/.config/nvim/plugged')
 " Colour schemes
@@ -39,9 +38,9 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'haya14busa/incsearch.vim'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
-
+Plug 'rstacruz/vim-closer'
+Plug 'ervandew/supertab'
 call plug#end()
-
 
 " ----- Colour scheme settings -----
 " Change the colour schemes for vim and airline
@@ -52,8 +51,9 @@ highlight Normal guibg=NONE ctermbg=NONE
 highlight LineNr ctermbg=NONE
 highlight CursorLineNr ctermbg=NONE
 
-
 " ----- Plugin specific settings -----
+" Tab complete in descending order
+let g:SuperTabDefaultCompletionType = "<c-n>"
 " Configure incsearch and disable persistent highlighting
 set hlsearch
 let g:incsearch#auto_nohlsearch = 1
@@ -66,7 +66,6 @@ map *  <Plug>(incsearch-nohl-*)
 map #  <Plug>(incsearch-nohl-#)
 map g* <Plug>(incsearch-nohl-g*)
 map g# <Plug>(incsearch-nohl-g#)
-
 
 " ----- Remap settings -----
 " Delete without copying visual block
