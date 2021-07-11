@@ -52,7 +52,7 @@ while True:
     posts = get(f"https://e621.net/posts.json?limit=320&tags={args.target}&page={page}", headers = headers).json()["posts"]
 
     # Parse each post into their respective arrays, with image ID, full size URL, and artist name
-    for post in posts: images.append([post["id"], post["file"]["url"], post["tags"]["artist"][0].replace("_(artist)", "")])
+    for post in posts: images.append([post["id"], post["file"]["url"], post["tags"]["artist"][0].replace("_(artist)", "") if post["tags"]["artist"] else ""])
 
     # Limit the parsed posts to that of the limit argument
     if args.limit and len(images) >= args.limit:
