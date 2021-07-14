@@ -1,6 +1,6 @@
 # Shell aliases
 
-# Colourise output when possible
+# Colourise output
 alias \
 	ls="ls -hN --color=auto --group-directories-first" \
 	grep="grep --color=auto" \
@@ -17,13 +17,14 @@ alias \
 	rm="rm -vI" \
 	df="df -h"
 
-# TODO
 # Common system commands
 alias \
 	p="sudo pacman" \
-	v="$EDITOR" \
+	v="nvim" \
 	sv="sudo nvim" \
 	r="ranger" \
 	sr="sudo ranger" \
 	ka="killall" \
-	g="git"
+	g="git" \
+	list="pacman -Qe" \
+	purge="sudo pacman -Rcns $(pacman -Qdtq)"
