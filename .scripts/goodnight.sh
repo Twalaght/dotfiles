@@ -42,10 +42,13 @@ array[36]="Three, two, one, let's jam!"
 array[37]="We'll all float on okay"
 array[38]="Hello, goodbye, I'll see you in hell!"
 array[39]="Here I am, stuck in the middle with you"
+array[40]="Keelah se'lai"
+array[41]="Had to be me, someone else might have gotten it wrong"
+array[42]="Does this unit have a soul?"
 
 # Function to print center text
 print_center() {
-	cols=$(tput cols) 
+	cols=$(tput cols)
 	printf "\n%*s\n" $(((${#1}+cols)/2)) "$1"
 }
 
