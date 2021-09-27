@@ -28,3 +28,5 @@ alias \
 	g="git" \
 	list="pacman -Qe" \
 	purge="sudo pacman -Rcns $(pacman -Qdtq)"
+	ytdlv="youtube-dl -f 'bestvideo+bestaudio' --merge-output-format mkv"
+	ytdla="youtube-dl -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0"
