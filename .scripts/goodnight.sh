@@ -47,6 +47,8 @@ array[41]="Had to be me, someone else might have gotten it wrong"
 array[42]="Does this unit have a soul?"
 array[43]="Don't forget, I'm with you in the dark"
 array[44]="NOW'S YOUR CHANCE TO BE A [[BIG SHOT]]"
+array[45]="It's not the end of the world, but you can see it from here"
+array[46]="May the flames guide thee"
 
 # Function to print center text
 print_center() {
