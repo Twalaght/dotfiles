@@ -22,6 +22,8 @@ set scrolloff=8
 set mouse=a
 " Remove trailing whitespace on save
 autocmd BufWritePre * %s/\s\+$//e
+" Ignore default python indentation settings
+let g:python_recommended_style = 0
 
 " ----- Plugin management -----
 call plug#begin('~/.config/nvim/plugged')
