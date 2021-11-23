@@ -20,13 +20,14 @@ alias \
 # Common system commands
 alias \
 	p="sudo pacman" \
-	v="nvim" \
-	sv="sudo nvim" \
+	v="$EDITOR" \
+	sv="sudo $EDITOR" \
 	r="ranger" \
 	sr="sudo ranger" \
 	ka="killall" \
 	g="git" \
 	list="pacman -Qe" \
 	purge="sudo pacman -Rcns $(pacman -Qdtq)"
-	ytdlv="youtube-dl -f 'bestvideo+bestaudio' --merge-output-format mkv"
-	ytdla="youtube-dl -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0"
+	ytmp4="yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio' --merge-output-format mp4" \
+	ytmkv="yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv" \
+	ytmp3="yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0"
