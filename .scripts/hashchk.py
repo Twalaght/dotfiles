@@ -8,7 +8,6 @@ parser = ArgumentParser(description="Find duplicate files by hash")
 parser.add_argument("target", metavar="folder", type=str, help="folder to be checked")
 args = parser.parse_args()
 
-
 # Return the md5 hash of a file
 def md5(path):
 	hash_md5 = hashlib.md5()
@@ -24,18 +23,11 @@ def md5(path):
 def iter_files(path):
 	return [item for item in path.rglob("*") if item.is_file()]
 
+# Hash each file and record unique hashes
 table = {}
 files = iter_files(Path(args.target))
-
-print(f"Hashing {len(files)} files")
-
-size = -1
 for i in range(len(files)):
-	tmp = int(((i + 1) / len(files)) * 50)
-
-	if size != tmp:
-		size = tmp
-		print(f"[{'#' * size}{'.' * (50 - size)}]", end = "\r")
+	print(f"Hashing {i + 1}/{len(files)}", end = "\r")
 
 	hash_md5 = md5(files[i])
 	if hash_md5 in table:
@@ -43,8 +35,9 @@ for i in range(len(files)):
 	else:
 		table[hash_md5] = [str(files[i])]
 
-print("\nDone")
+print("\n")
 
+# Find duplicate files and print them
 dupes = []
 for v in table.values():
 	if len(v) > 1:
@@ -53,6 +46,3 @@ for v in table.values():
 for i in range(len(dupes)):
 	print(f"Duplicate group {i + 1}")
 	for d in dupes[i]: print(f"\t{d}")
-
-
-# Path(path).stat().st_size
