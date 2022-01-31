@@ -1,6 +1,6 @@
 # Shell aliases
 
-# Colourise output
+# Colourise output when possible
 alias \
 	ls="ls -hN --color=auto --group-directories-first" \
 	grep="grep --color=auto" \
@@ -19,15 +19,13 @@ alias \
 
 # Common system commands
 alias \
-	p="sudo pacman" \
 	v="$EDITOR" \
 	sv="sudo $EDITOR" \
-	r="ranger" \
-	sr="sudo ranger" \
-	ka="killall" \
 	g="git" \
-	list="pacman -Qe" \
-	purge="sudo pacman -Rcns $(pacman -Qdtq)"
-	ytmp4="yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio' --merge-output-format mp4" \
-	ytmkv="yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv" \
-	ytmp3="yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0"
+	ytmp4="yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio' --merge-output-format mp4 -o '%(title)s.%(ext)s'" \
+	ytmkv="yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv -o '%(title)s.%(ext)s'" \
+	ytmp3="yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s'"
+
+# p="sudo pacman" \
+# plist="pacman -Qe" \
+# purge="sudo pacman -Rcns $(pacman -Qdtq)"
