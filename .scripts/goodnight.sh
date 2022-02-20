@@ -49,6 +49,8 @@ array[43]="Don't forget, I'm with you in the dark"
 array[44]="NOW'S YOUR CHANCE TO BE A [[BIG SHOT]]"
 array[45]="It's not the end of the world, but you can see it from here"
 array[46]="May the flames guide thee"
+array[47]="Be safe, friend. Don't you dare go hollow"
+array[48]="This is it, Madeline. Just breathe. You can do this."
 
 # Function to print center text
 print_center() {
