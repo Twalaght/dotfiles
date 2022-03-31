@@ -28,5 +28,5 @@ for arg in "$@"; do
 	fi
 done
 
-# Open the processed folder
-cd /tmp/comics/ && explorer.exe .
+# Open the processed folder in explorer if possible
+[ -x "$(command -v explorer.exe)" ] && cd /tmp/comics/ && explorer.exe .
