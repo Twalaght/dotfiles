@@ -39,6 +39,9 @@ base_dir = Path(base_dir)
 headers = gen_headers()
 comics = read_db(base_dir)
 
+# Sort the fetched comics entries by name
+comics.sort(key = lambda x: x[1])
+
 # For each comic in the watchlist check its local data against the server
 for comic in comics:
 	# Count how many local files we have, with an offset included
