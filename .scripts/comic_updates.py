@@ -75,10 +75,6 @@ def chain(base_dir, comic):
 
 	return page, args
 
-
-
-
-
 # Define image and page behavior for each webcomic
 class pix_and_hen:
 	def image(soup):
