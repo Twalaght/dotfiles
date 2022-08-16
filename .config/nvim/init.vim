@@ -41,7 +41,7 @@ Plug 'haya14busa/incsearch.vim'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'rstacruz/vim-closer'
-Plug 'ervandew/supertab'
+" Plug 'ervandew/supertab'
 call plug#end()
 
 " ----- Colour scheme settings -----
@@ -55,7 +55,7 @@ highlight CursorLineNr ctermbg=NONE
 
 " ----- Plugin specific settings -----
 " Tab complete in descending order
-let g:SuperTabDefaultCompletionType = "<c-n>"
+" let g:SuperTabDefaultCompletionType = "<c-n>"
 " Configure incsearch and disable persistent highlighting
 set hlsearch
 let g:incsearch#auto_nohlsearch = 1
@@ -84,3 +84,14 @@ inoremap <silent> <F6> <C-O>:set spell!<cr>
 " Remap F5 to insert a timestamp
 nnoremap <F5> "=strftime("%I:%M %p %a %d/%m/%Y")<CR>p
 inoremap <F5> <C-R>=strftime("%I:%M %p %a %d/%m/%Y")<CR>
+" Remap F8 to open a new terminal
+nnoremap <F8> :tabnew \| :term<CR>i
+tnoremap <C-[> <C-\><C-n>
+tnoremap <Esc> <C-\><C-n>
+
+" Set up a function for hot swapping between tabs
+if !exists('g:lasttab')
+	let g:lasttab = 1
+endif
+nmap <Leader>t :exe "tabn ".g:lasttab<CR>
+au TabLeave * let g:lasttab = tabpagenr()
