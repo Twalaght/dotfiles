@@ -33,3 +33,22 @@ bind "set bell-style none"
 
 # Enable persistence for wal colour schemes
 [[ -f $HOME/.cache/wal/sequences ]] && (cat ~/.cache/wal/sequences &)
+
+# Default tmux instance command
+tm() {
+	name="main"
+	if tmux ls &> /dev/null; then
+		tmux attach
+	else
+		tmux new -s "$name" -d
+		tmux split-window -h -p 25
+		tmux last-pane
+
+		if ! [ -z "$1" ]; then
+			pane="$name:0.0"
+			tmux send-keys -t "$pane" "$EDITOR $1" Enter
+		fi
+
+		tmux attach-session -t "$name"
+	fi
+}
