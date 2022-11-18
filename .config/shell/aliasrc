@@ -21,11 +21,21 @@ alias \
 alias \
 	v="$EDITOR" \
 	sv="sudo $EDITOR" \
-	g="git" \
 	ytmp4="yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio' --merge-output-format mp4 -o '%(title)s.%(ext)s'" \
 	ytmkv="yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv -o '%(title)s.%(ext)s'" \
 	ytmp3="yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s'"
 
-# p="sudo pacman" \
-# plist="pacman -Qe" \
-# purge="sudo pacman -Rcns $(pacman -Qdtq)"
+# Git commands
+alias \
+	g="git" \
+	gs="git status" \
+	ga="git add" \
+	gc="git commit" \
+	gd="git diff" \
+	gco="git checkout" \
+	gp="git push" \
+	gpo="git push origin" \
+	gpl="git pull" \
+	gplo="git pull origin" \
+	gb="git branch" \
+	gbr="git branch -r"
