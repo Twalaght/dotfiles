@@ -72,24 +72,7 @@ zstyle ":vcs_info:git:*" actionformats "%F{10}[%f%F{12}b|%a%u%c%f%F{10}]%f"
 
 # Load the shell alias file
 [[ -f "$HOME/.config/shell/aliasrc" ]] && source "$HOME/.config/shell/aliasrc"
+# Load the shell function file
+[[ -f "$HOME/.config/shell/funcrc" ]] && source "$HOME/.config/shell/funcrc"
 # Load the completion file
 [[ -f "$ZDOTDIR/completion.zsh" ]] && source "$ZDOTDIR/completion.zsh"
-
-# Default tmux instance command
-tm() {
-	name="main"
-	if tmux ls &> /dev/null; then
-		tmux attach
-	else
-		tmux new -s "$name" -d
-		tmux split-window -h -p 25
-		tmux last-pane
-
-		if ! [ -z "$1" ]; then
-			pane="$name:0.0"
-			tmux send-keys -t "$pane" "$EDITOR $1" Enter
-		fi
-
-		tmux attach-session -t "$name"
-	fi
-}
