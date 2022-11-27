@@ -24,21 +24,5 @@ PS1="${GREEN}[\u${BLUE}@${GREEN}\h ${BLUE}\W${GREEN}]${CLEAR}$ "
 # If the alias file is present, load it
 [[ -f "$HOME/.config/shell/aliasrc" ]] && source "$HOME/.config/shell/aliasrc"
 
-# Default tmux instance
-tm() {
-	name="main"
-	if tmux ls &> /dev/null; then
-		tmux attach
-	else
-		tmux new -s "$name" -d
-		tmux split-window -h -p 25
-		tmux last-pane
-
-		if ! [ -z "$1" ]; then
-			pane="$name:0.0"
-			tmux send-keys -t "$pane" "$EDITOR $1" Enter
-		fi
-
-		tmux attach-session -t "$name"
-	fi
-}
+# If the function file is present, load it
+[[ -f "$HOME/.config/shell/funcrc" ]] && source "$HOME/.config/shell/funcrc"
