@@ -13,6 +13,7 @@ bindkey -M menuselect "^xu" undo
 
 autoload -Uz compinit; compinit
 setopt GLOB_COMPLETE     # Show autocompletion menu with globs
+setopt GLOBDOTS          # Recognise dot files
 setopt AUTO_LIST         # Automatically list choices on ambiguous completion.
 setopt COMPLETE_IN_WORD  # Complete from both ends of a word.
 
