@@ -1,40 +1,30 @@
-# Bash shell configuration
-
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+# Disable the system bell
+bind "set bell-style none"
+
 # Misc shell options
-export HISTFILE=$HOME/.config/shell/bash_history
+export HISTFILE="$HOME/.config/shell/bash/bash_history"
 HISTCONTROL=ignoreboth
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=10000
+HISTFILESIZE=10000
 shopt -s histappend
 shopt -s checkwinsize
 set -o vi
 bind -m vi-command "Control-l: clear-screen"
 bind -m vi-insert "Control-l: clear-screen"
 
-# Set the default editors to nvim
-export EDITOR="nvim"
-export VISUAL="nvim"
-
-# Shortcuts to edit and source this file
-alias ec="$EDITOR $HOME/.bashrc"
-alias sc="source $HOME/.bashrc"
+# Set the PS1 prompt with terminal colours
+GREEN="\e[38;5;10m"
+BLUE="\e[38;5;12m"
+CLEAR="\e[m"
+PS1="${GREEN}[\u${BLUE}@${GREEN}\h ${BLUE}\W${GREEN}]${CLEAR}$ "
 
 # If the alias file is present, load it
-[[ -f $HOME/.config/shell/aliasrc ]] && source $HOME/.config/shell/aliasrc
+[[ -f "$HOME/.config/shell/aliasrc" ]] && source "$HOME/.config/shell/aliasrc"
 
-# Sets the PS1 prompt with terminal colours
-PS1="\[\e[38;5;10m\][\u@\h \[\e[38;5;12m\]\W\[\e[38;5;10m\]]\[\e[38;5;15m\]\$ "
-
-# Turn off system bell
-bind "set bell-style none"
-
-# Enable persistence for wal colour schemes
-[[ -f $HOME/.cache/wal/sequences ]] && (cat ~/.cache/wal/sequences &)
-
-# Default tmux instance command
+# Default tmux instance
 tm() {
 	name="main"
 	if tmux ls &> /dev/null; then
