@@ -44,18 +44,21 @@ Plug 'rstacruz/vim-closer'
 " Plug 'ervandew/supertab'
 call plug#end()
 
-" ----- Colour scheme settings -----
-" Change the colour schemes for vim and airline
+" ----- Display settings -----
+" Change the colour scheme and airline settings
 colorscheme monokai
 let g:airline_theme="badwolf"
+if !exists("g:airline_symbols") | let g:airline_symbols = {} | endif
+let g:airline_symbols.colnr = " C:"
+let g:airline_symbols.linenr = " L:"
+let g:airline_symbols.maxlinenr = ""
+
 " Disable background colour of the theme
-highlight Normal guibg=NONE ctermbg=NONE
-highlight LineNr ctermbg=NONE
-highlight CursorLineNr ctermbg=NONE
+" highlight Normal guibg=NONE ctermbg=NONE
+" highlight LineNr ctermbg=NONE
+" highlight CursorLineNr ctermbg=NONE
 
 " ----- Plugin specific settings -----
-" Tab complete in descending order
-" let g:SuperTabDefaultCompletionType = "<c-n>"
 " Configure incsearch and disable persistent highlighting
 set hlsearch
 let g:incsearch#auto_nohlsearch = 1
@@ -85,13 +88,6 @@ inoremap <silent> <F6> <C-O>:set spell!<cr>
 nnoremap <F5> "=strftime("%I:%M %p %a %d/%m/%Y")<CR>p
 inoremap <F5> <C-R>=strftime("%I:%M %p %a %d/%m/%Y")<CR>
 " Remap F8 to open a new terminal
-nnoremap <F8> :tabnew \| :term<CR>i
-tnoremap <C-[> <C-\><C-n>
-tnoremap <Esc> <C-\><C-n>
-
-" Set up a function for hot swapping between tabs
-if !exists('g:lasttab')
-	let g:lasttab = 1
-endif
-nmap <Leader>t :exe "tabn ".g:lasttab<CR>
-au TabLeave * let g:lasttab = tabpagenr()
+" nnoremap <F8> :tabnew \| :term<CR>i
+" tnoremap <C-[> <C-\><C-n>
+" tnoremap <Esc> <C-\><C-n>
