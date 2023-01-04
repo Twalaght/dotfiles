@@ -17,10 +17,11 @@ setopt PUSHD_SILENT         # Do not print the directory stack after pushd or po
 alias d="dirs -v"
 for index ({1..9}) alias "$index"="cd +${index}"; unset index
 
-# Enable vi mode
+# Enable vi mode and history searching
 bindkey -v
 export KEYTIMEOUT=1
 bindkey -v "^?" backward-delete-char
+bindkey "^R" history-incremental-search-backward
 
 # Pressing "v" in vi normal mode edits the command in editor
 autoload -Uz edit-command-line
@@ -55,11 +56,18 @@ bindkey -M visual S add-surround
 # %F => colour set, %f => colour reset, %~ => pwd, %n => username, %m => host
 PROMPT="%F{10}[%n%f%F{12}@%f%F{10}%m%f %F{12}%1~%f%F{10}]%f$ "
 
+# Set the window title, used for WSL
+DISABLE_AUTO_TITLE="true"
+echo -ne "\033];${PWD##*/}\007"
+
 # Enable git status on the right side prompt
 autoload -Uz vcs_info
 setopt PROMPT_SUBST
 precmd_functions+=(vcs_info)
 RPROMPT='${vcs_info_msg_0_}'
+
+# Modify the time format for readability
+TIMEFMT=$'\nreal\t%*E\nuser\t%*U\nsys\t%*S'
 
 # Enable checking for changes to the repo, and custom strings for each
 zstyle ":vcs_info:*" check-for-changes true
@@ -76,3 +84,4 @@ zstyle ":vcs_info:git:*" actionformats "%F{10}[%f%F{12}b|%a%u%c%f%F{10}]%f"
 [[ -f "$HOME/.config/shell/funcrc" ]] && source "$HOME/.config/shell/funcrc"
 # Load the completion file
 [[ -f "$ZDOTDIR/completion.zsh" ]] && source "$ZDOTDIR/completion.zsh"
+
