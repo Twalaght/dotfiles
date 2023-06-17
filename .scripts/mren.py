@@ -1,71 +1,189 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
+import logging
+import re
 from argparse import ArgumentParser
+from datetime import datetime
 from pathlib import Path
-from re import split as resplit
 
-# Read the arguments given to the script
-parser = ArgumentParser(description="Mass rename files in a specified folder")
-parser.add_argument("target", metavar="folder", type=str, help="folder of files to rename")
-parser.add_argument("name", metavar="new name", type=str, help="new name for the files")
-parser.add_argument("-z", "--zeros", type=int, help="set the length of zero padding")
-parser.add_argument("-o", "--offset", type=int, default=1, help="set the starting number")
-parser.add_argument("-v", "--verbose", action="store_true", help="display full rename preview")
-args = parser.parse_args()
+class Renamer():
+	def __init__(self, folder: str):
+		self.folder = folder
+		unsorted_files = map(str, Path(folder).glob("*.*"))
+		self.files = self.natural_sort(unsorted_files)
 
-# Sort file names by natural counting
-def natural_sort(input_list):
-	convert = lambda text: int(text) if text.isdigit() else text.lower()
-	alphanum_key = lambda key: [convert(x) for x in resplit("([0-9]+)", key)]
-	return sorted(input_list, key=alphanum_key)
+	@staticmethod
+	def natural_sort(unsorted: list) -> list:
+		"""Sort a list based on natural counting
 
-# Display the old and new names for a give set of files
-def preview(files, width):
-	for f in files:
-		original = f"{f['old_name']}.{f['ext']}"
-		new = f"{f['new_name']}.{f['ext']}"
-		print(f"{original: <{width}} -> {new}")
+		Args:
+			files (list): List of strings
 
-# Build and sort the file list into a dictionary
-files = [str(x) for x in Path(args.target).glob("*.*")]
-files = natural_sort(files)
-# files = [{"path": x} for x in files]
+		Returns:
+			list: Sorted list of strings
+		"""
+		convert = lambda text: int(text) if text.isdigit() else text.lower()
+		alphanumeric_key = lambda key: [convert(x) for x in re.split("([0-9]+)", key)]
+		return sorted(unsorted, key = alphanumeric_key)
 
-# Determine the required zero padding for new file names
-max_len = len(files) + args.offset if args.offset else 0
-pad = max(len(str(max_len)), 2)
-if args.zeros and args.zeros > pad: pad = args.zeros
+	def generate_timestamps(self) -> list:
+		"""Create a list of file names by their date modified timestamp
 
-# Update each files dictionary entry with extension and both names
-for i in range(len(files)):
-	path = files[i].rsplit("/", 1)[0]
-	old_name, ext = str(files[i]).split("/")[-1].rsplit(".", 1)
-	new_name = f"{args.name}{str(i + args.offset).zfill(pad)}"
-	files[i] = {"path": path, "ext": ext, "old_name": old_name, "new_name": new_name}
+		Returns:
+			list: Ordered list of names mapped to objects file list
+		"""
+		new_names = []
+		for file_path in self.files:
+			# Generate a timestamp string from the files modification time
+			last_modified = Path(file_path).stat().st_mtime
+			timestamp = datetime.fromtimestamp(last_modified).strftime("%Y%m%d_%H%M%S")
 
-# Preview the rename operation before it takes place
-print("Rename preview:")
-max_width = max([len(f"{x['old_name']}.{x['ext']}") for x in files])
-if args.verbose or len(files) <= 20:
-	preview(files, max_width)
-else:
-	preview(files[:10], max_width)
-	print(f"{'': <{max_width}}....")
-	preview(files[-10:], max_width)
+			# Append a counter if the name is not unique
+			duplicates = [name for name in new_names if timestamp in name]
+			if duplicates: timestamp += f"({len(duplicates) - 1})"
+			new_names.append(timestamp)
 
-# Check for response to continue with the rename job
-print("\nContinue with rename? Y/N")
-response = input().lower()
-if not response or response[0] != "y": exit()
+		return new_names
 
-# Rename process
-old_paths = [Path(f["path"]) / f"{f['old_name']}.{f['ext']}" for f in files]
-new_paths = [Path(f["path"]) / f"{f['new_name']}.{f['ext']}" for f in files]
-for i in range(len(old_paths)): Path(old_paths[i]).rename(new_paths[i])
+	def generate_names(self, name: str, offset: int, zeros: int) -> list:
+		"""Create a list of incrementing file names
 
-# Prompt the user to revert if required
-print("\nKeep changes? Y/N")
-response = input().lower()
-if response and response[0] == "y": exit()
-print("Reverting changes")
-for i in range(len(old_paths)): Path(new_paths[i]).rename(old_paths[i])
+		Args:
+			name (str): New name to use, defaults to the parent folder
+			offset (int): Starting number to begin numbering files from
+			zeros (int): Length of zero padding to use in numbering
+
+		Returns:
+			list: Ordered list of names mapped to objects file list
+		"""
+		# Set zero padding to match number of files, if not provided
+		max_len = len(self.files) + offset if offset else 0
+		zero_pad = max(len(str(max_len)), 2)
+		if zeros and zeros > zero_pad: zero_pad = zeros
+
+		# If name is unset, default to the parent folder
+		if not name: name = Path(self.folder).resolve().name
+
+		# If a separator is not used in the name, default to a space
+		if name[-1].isalnum(): name += " "
+
+		new_names = []
+		for i in range(len(self.files)):
+			new_name = f"{name}{str(i + offset).zfill(zero_pad)}"
+			new_names.append(new_name)
+
+		return new_names
+
+	@staticmethod
+	def prepare(files: list, new_names: list) -> list:
+		"""Create list of file rename operations to perform
+
+		Args:
+			files (list): Original list of files
+			new_names (list): List of names to change the files to
+
+		Returns:
+			list: _description_
+		"""
+		# Ensure input and output lists are the same size
+		len_in, len_out = len(files), len(new_names)
+		assert len_in == len_out, f"Input length ({len_in}) and output length ({len_out}) did not match"
+
+		operations = []
+		for old_file, new_file in zip(files, new_names):
+			old_path = Path(old_file)
+			new_path = old_path.parent / (new_file + old_path.suffix)
+			operations.append([old_path, new_path])
+
+		# Preview the rename operation before it takes place
+		preview = lambda paths: print(f"{str(paths[0].name): <{max_width}} -> {str(paths[1].name)}")
+		max_width = max([len(str(files[0].name)) for files in operations])
+
+		print("Rename preview:")
+		if logger.level >= logging._nameToLevel["WARN"]:
+			# Print a short preview if no verbosity argument given
+			for paths in operations[:5]: preview(paths)
+			print(f"{'': <{max_width}}....")
+			for paths in operations[-5:]: preview(paths)
+		else:
+			# Print additional information as required by logger verbosity
+			for paths in operations:
+				preview(paths)
+				if logger.level <= logging._nameToLevel["DEBUG"]:
+					logger.debug(f"{paths[0]} -> {paths[1]}")
+
+		return operations
+
+	@staticmethod
+	def execute(operations: list) -> None:
+		"""Perform file renaming based on input list
+
+		Args:
+			operations (list): List of files to rename and their new names
+		"""
+		name_pool = [files[0].name for files in operations]
+
+		# Check unique case where new names are identical to original
+		if set(name_pool) == {files[1].name for files in operations}: return
+
+		# Cycle through the operations list until it is empty
+		while operations:
+			tmp = operations.pop(0)
+
+			# Ensure each rename does not overwrite an existing file
+			if tmp[1].name not in name_pool:
+				logger.debug(f"Renaming {tmp[0]} -> {tmp[1]}")
+				Path(tmp[0]).rename(tmp[1])
+
+				# Rename the file in the name pool
+				name_pool.remove(tmp[0].name)
+				name_pool.append(tmp[1].name)
+			else:
+				operations.append(tmp)
+
+	def rename(self, time: bool, name: str, offset: int, zeros: int, yes: bool) -> None:
+		"""Batch rename the internal list of files
+
+		Args:
+			time (bool): Rename files to timestamps of their date modified
+			name (str): New name to rename files to
+			offset (int): Starting number to begin numbering files from
+			zeros (int): Length of zero padding to use in numbering
+			yes (bool): Assume yes to the continue prompt if set
+		"""
+		# Generate new names using the appropriate method
+		if time: new_names = self.generate_timestamps()
+		else: new_names = self.generate_names(name, offset, zeros)
+
+		# Create list of rename operations
+		operations = self.prepare(self.files, new_names)
+
+		# Prompt the user to confirm if the assume yes flag is not present
+		if not yes:
+			print("Continue with rename? Y/N ", end="")
+			response = input().lower()
+			if not response or response[0] != "y": return
+
+		# Perform all rename operations
+		self.execute(operations)
+
+if __name__ == "__main__":
+	# Read the arguments given to the script
+	parser = ArgumentParser(description="Mass rename files in a specified folder")
+	parser.add_argument("folder", type=str, default=".", help="folder of files to rename")
+	parser.add_argument("-t", "--time", action="store_true", help="rename based on timestamps")
+	parser.add_argument("-n", "--name", type=str, help="new base name to use")
+	parser.add_argument("-o", "--offset", type=int, default=1, help="set starting number")
+	parser.add_argument("-z", "--zeros", type=int, help="set zero pad length")
+	parser.add_argument("-y", "--yes", action="store_true", help="automatic yes to prompts")
+	parser.add_argument("-v", "--verbose", action="count", default=0, help="display debug info")
+	args = parser.parse_args()
+
+	logging.basicConfig(format = "%(levelname)s:%(name)s: %(message)s")
+	logger = logging.getLogger()
+
+	if args.verbose > 0: logger.setLevel("INFO")
+	if args.verbose > 1: logger.setLevel("DEBUG")
+
+	renamer = Renamer(args.folder)
+	renamer.rename(args.time, args.name, args.offset, args.zeros, args.yes)
