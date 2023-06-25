@@ -4,6 +4,7 @@ import logging
 import re
 from argparse import ArgumentParser
 from datetime import datetime
+from exiftool import ExifToolHelper
 from pathlib import Path
 
 class Renamer():
@@ -32,16 +33,26 @@ class Renamer():
 		Returns:
 			list: Ordered list of names mapped to objects file list
 		"""
+		with ExifToolHelper() as exif:
+			metadata = exif.get_metadata(self.files)
+			assert len(metadata) == len(self.files), "Could not fetch metadata for all files"
+
+		# Generate a timestamp string from the files metadata, preferring exif data over modification time
 		new_names = []
-		for file_path in self.files:
-			# Generate a timestamp string from the files modification time
-			last_modified = Path(file_path).stat().st_mtime
-			timestamp = datetime.fromtimestamp(last_modified).strftime("%Y%m%d_%H%M%S")
+		for file_path, file_metadata in zip(self.files, metadata):
+			for tag in ["EXIF:CreateDate", "QuickTime:CreateDate", "File:FileModifyDate"]:
+				if tag in file_metadata:
+					logger.debug(f"Using {tag} for {file_path}")
+					date = file_metadata[tag].replace("-", "+").split("+")[0]
+					break
+
+			timestamp = datetime.strptime(date, "%Y:%m:%d %H:%M:%S").timestamp()
+			time_string = datetime.fromtimestamp(timestamp).strftime("%Y%m%d_%H%M%S")
 
 			# Append a counter if the name is not unique
-			duplicates = [name for name in new_names if timestamp in name]
-			if duplicates: timestamp += f"({len(duplicates) - 1})"
-			new_names.append(timestamp)
+			duplicates = [name for name in new_names if time_string in name]
+			if duplicates: time_string += f"({len(duplicates) - 1})"
+			new_names.append(time_string)
 
 		return new_names
 
@@ -100,7 +111,7 @@ class Renamer():
 		max_width = max([len(str(files[0].name)) for files in operations])
 
 		print("Rename preview:")
-		if logger.level >= logging._nameToLevel["WARN"]:
+		if logger.level >= logging._nameToLevel["WARN"] and len(operations) > 10:
 			# Print a short preview if no verbosity argument given
 			for paths in operations[:5]: preview(paths)
 			print(f"{'': <{max_width}}....")
@@ -109,8 +120,7 @@ class Renamer():
 			# Print additional information as required by logger verbosity
 			for paths in operations:
 				preview(paths)
-				if logger.level <= logging._nameToLevel["DEBUG"]:
-					logger.debug(f"{paths[0]} -> {paths[1]}")
+				logger.debug(f"{paths[0]} -> {paths[1]}")
 
 		return operations
 
