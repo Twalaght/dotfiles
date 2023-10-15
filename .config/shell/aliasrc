@@ -1,11 +1,18 @@
 # Shell aliases
 
+# OS specific aliases
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+	alias \
+		ls="ls -hN --color=auto --group-directories-first" \
+		diff="diff --color=auto"
+else
+	alias \
+		ls="gls -hN --color=auto --group-directories-first"
+fi
+
 # Colourise output when possible
 alias \
-	ls="ls -hN --color=auto --group-directories-first" \
-	grep="grep --color=auto" \
-	diff="diff --color=auto" \
-	ccat="highlight --out-format=ansi"
+	grep="grep --color=auto"
 
 # Common file commands
 alias \
@@ -23,8 +30,7 @@ alias \
 	sv="sudo $EDITOR" \
 	ytmp4="yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio' --merge-output-format mp4 -o '%(title)s.%(ext)s'" \
 	ytmkv="yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv -o '%(title)s.%(ext)s'" \
-	ytmp3="yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s'" \
-	tmux="tmux -f '$HOME/.config/tmux/tmux.conf'"
+	ytmp3="yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s'"
 
 # Git commands
 alias \
@@ -35,8 +41,10 @@ alias \
 	gd="git diff" \
 	gco="git checkout" \
 	gp="git push" \
-	gpo="git push origin" \
+	gpf="git push --force-with-lease" \
+	gf="git fetch" \
 	gpl="git pull" \
-	gplo="git pull origin" \
 	gb="git branch" \
-	gbr="git branch -r"
+	gr="git rebase" \
+	gri="git rebase --interactive" \
+	gl="git log"
