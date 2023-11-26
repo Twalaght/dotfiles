@@ -1,5 +1,9 @@
 # Shell config
 export ZDOTDIR="$HOME/.config/shell/zsh"
+source "$HOME/.config/shell/profile"
+
+# Prevent Python from making pycache files
+export PYTHONDONTWRITEBYTECODE=1
 
 # Set nvim as the system default editors
 export EDITOR="nvim"
