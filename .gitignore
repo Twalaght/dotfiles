@@ -1,3 +1,4 @@
-config/nvim/plugged
-config/shell/zsh/.zcompdump
-config/shell/zsh/.zsh_history
+*/nvim/plugged
+__pycache__
+.zcompdump
+.zsh_history
