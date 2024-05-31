@@ -7,6 +7,7 @@ export HISTSIZE=10000
 export SAVEHIST=10000
 setopt HIST_IGNORE_ALL_DUPS
 setopt SHARE_HISTORY
+setopt HIST_IGNORE_SPACE
 
 # Set up directory stack
 setopt AUTO_PUSHD           # Push the current directory visited on the stack
