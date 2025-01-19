@@ -100,7 +100,3 @@ inoremap <silent> <F6> <C-O>:set spell!<cr>
 " Remap F5 to insert a timestamp
 nnoremap <F5> "=strftime("%I:%M %p %a %d/%m/%Y")<CR>p
 inoremap <F5> <C-R>=strftime("%I:%M %p %a %d/%m/%Y")<CR>
-" Remap F8 to open a new terminal
-" nnoremap <F8> :tabnew \| :term<CR>i
-" tnoremap <C-[> <C-\><C-n>
-" tnoremap <Esc> <C-\><C-n>
