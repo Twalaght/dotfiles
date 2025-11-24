@@ -73,3 +73,6 @@ TIMEFMT=$'\nreal\t%*E\nuser\t%*U\nsys\t%*S'
 # Load the shell alias file
 [[ -f "$HOME/.config/shell/aliasrc" ]] && source "$HOME/.config/shell/aliasrc"
 
+# Load NixOS home manager config, if present
+[[ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]] && source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+
